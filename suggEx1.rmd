@@ -1,0 +1,143 @@
+---
+title: "Suggested Exercises 1"
+author: "Gilles Lamothe"
+date: "Sept 13, 2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Questions
+
+***Question 1:*** Online orders make up more than half of all orders for some big chain pizza stores. 
+According to a recent survey, approximately 60% of all pizza stores offer online ordering. 
+Suppose 20 pizza stores are randomly selected. Assume that the population of pizza stores is large enough, so that it is reasonable to assume that they are independent in the random selection. 
+
+Use R to compute the following probabilities. 
+
+(a) Find the probability that at most 12 offer online orders. 
+
+(b) Find the probability that exactly 14 offer online orders. 
+
+(c) Find the probability that at least 9 offer online orders. 
+
+(d) Find the probability that between 10 and 15 (inclusively) offer online orders. 
+
+
+***Question 2:*** The cholesterol-lowering drugs known as statins may cause several painful side effects 
+including blurred vision and fever. In a recent study, researchers claimed that 10% of people taking 
+a statin suffer from some form of muscle pain. Unfortunately, people who experience this muscle pain 
+may stop taking the statin and, therefore, are at greater risk of a heart attack or stroke. Suppose 
+that 25 people who need a statin are selected at random. Each is given a 40-mg dose (per day), 
+and the number of people who experience muscle pain is recorded. 
+
+(a) Let $Y$ be the number of participants (among the 25) that suffer from some form of muscle pain. Give the distribution of $Y$. 
+
+(b) Find the probability that at most one participant will experience muscle pain. 
+
+(c) Find the probability that at least 7 participants will experience muscle pain. 
+
+***Question: 3*** The cholesterol-lowering drugs known as statins may cause several painful side effects 
+including blurred vision and fever. In a recent study, researchers claimed that 10% of people taking 
+a statin suffer from some form of muscle pain. Unfortunately, people who experience this muscle pain 
+may stop taking the statin and, therefore, are at greater risk of a heart attack or stroke. Suppose 
+that 25 people who need a statin are selected at random. Each is given a 40-mg dose (per day), 
+and the number of people who experience muscle pain is recorded. Considering the population of people who need statin. Let $\pi$ be the probability that such a person suffer from some form of muscle pain. Suppose that among the 25 participants, we observed 7 that suffer from some form of muscle pain. 
+
+(a) Give an estimate of $\pi$, and the corresponding standard error of the estimate. 
+
+(b) Give the Wald 95% confidence interval for $\pi$. 
+
+
+(c) Use the Wald test to test $H_0:\pi=0.1$ against $H_a:\pi\neq 0.1$ at a level of significance of $\alpha=5\%$. Give the observed value of the test statistic, the $p$-value, and the conclusion. 
+
+
+# Solutions
+
+***Question 1:*** Let $Y$ be the number of pizza stores (out of the 20 selected) that offer online orders. 
+$Y$ has a binomial distribution with $n=20$ and $\pi=0.60$. 
+
+(a) The probability that at most 12 offer online orders is $P(Y\leq 12)=0.5841$. 
+
+```{r }
+sum(dbinom(0:12,20,.6))
+```
+
+(b) The probability that exactly 14 offer online orders is $P(Y=14)=0.1244.$
+
+```{r }
+dbinom(14,20,.6)
+```
+
+```{r}
+
+### The slash would suggest that the value after it is a special symbol. 
+
+```
+
+
+(c) The probability that at least 9 offer online orders is $P(Y\geq 9)=0.9434.$.
+
+```{r }
+sum(dbinom(9:20,20,.6))
+```
+
+
+(d) The probability that between 10 and 15 (inclusively) offer online orders is  $P(10 \leq Y\leq 15)=0.8215$.
+
+```{r }
+sum(dbinom(10:15,20,.6))
+```
+
+
+***Question 2:*** 
+
+(a) $Y$ has a $B(n=25,\pi=0.10)$ distribution. 
+
+(b) The probability that at most one participant will experience muscle pain is $P(Y\leq 1)=0.2712$. 
+
+```{r }
+sum(dbinom(0:1,25,0.1))
+```
+
+
+
+(c) Find the probability that at least 7 participants will experience muscle pain. $P(Y\geq 7)=0.0095$. 
+
+```{r }
+sum(dbinom(7:25,25,0.1))
+```
+
+***Question 3:*** (a) An estimate of $\pi$ is $\hat{\pi}=y/n=7/25=0.28$. The standard error is 
+$$
+\mbox{se}(\hat{\pi})=\sqrt{\frac{\hat{\pi}(1-\hat{\pi})}{n}}=0.0898. 
+$$
+```{r }
+p<-7/25
+p
+se<-sqrt(p*(1-p)/25)
+se
+```
+
+
+(b) The Wald 95% CI for $\pi$ is $\hat{\pi}\pm 1.96\, \mbox{se}({\hat{\pi}})=(0.104, 0.456).$
+
+```{r }
+c(p-1.96*se,p+1.96*se)
+```
+
+
+(c) The observed value of the Wald test statistic is 
+$$
+z_0=\frac{\hat{\pi}-0.1}{\mbox{se}(\hat{\pi})}=2.0045,
+$$
+where $\hat{\pi}=7/25=0.28$, and $\mbox{se}(\hat{\pi})=\sqrt{\hat{\pi}\,(1-\hat{\pi})/n}=0.08980$. 
+The $p$-value is $2\,P(Z\geq 2.0045)=0.045,$ where $Z$ has a $N(0,1)$ distribution. At a level of significance of 5%, there is significant evidence against the claim that 10% of people taking a statin suffer from some form of muscle pain. 
+
+```{r }
+2*(1-pnorm(2.0045))
+```
+
+
