@@ -32,4 +32,6 @@ p-value = 0.4686
 qbeta(0.25, 1, 6) 
 qbeta(0.975, 2,5) 
 ```
-
+```{r}
+print ("Hello World")
+```
