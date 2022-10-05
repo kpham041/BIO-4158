@@ -2,7 +2,7 @@
 
 
 
-## THis respository is for the version control of our R_code
+## This respository is for the version control of our R_code
 
 If u have a piece of code that u just finish writing, feel free to add them here. Just click "Add file" and then upload the file are working on. Even you just figure out how to write a function in R-mark down, just upload them here (every step counts :) ).  Remember to comment and explain all the files you upload, so that it would be easy for team members to use them. 
 
