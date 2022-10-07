@@ -3,10 +3,10 @@ title: "Bio4158 - Devoir 3"
 author: "Groupe XX - Nom1, Nom2, Nom3"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document:
-    number_sections: no
   html_document:
     df_print: paged
+  pdf_document:
+    number_sections: no
 ---
 
 Here are the needed packages
@@ -227,17 +227,67 @@ Overall, From addressing quality of data and power, I conclude that we **should 
   
 5. Yarmouth is only one of the six locations for which she needs to quantify the extent of any climate change. Plot the temporal trend for temperature separately for each station (2 points), and estimate the rate of change for each station (2 points).
 
+
+First, we will create multiple subsets, each associates to one city. 
+
+
 ```{r}
-# All_loc_regression <-climate %>% 
-#                       group_by(loc) %>% 
-#                       nest() %>% 
-#                       mutate(model = map(data, ~lm(ave ~ year, data = .)))
-# 
-# for (cat in All_loc_regression$model){
-#   
-#   print(cat)
-# }
+# Split climate in multiple dataframe, each associates with one city
+cities <- climate %>% 
+  group_split(loc)
+
+# Let's examine the structure of variable cities 
+str(cities)
+
+# name each elment of "cities" with the correct name
+Alert <- cities[[1]]
+Mould_Bay <- cities[[2]]
+Sachs_Habor <- cities[[3]]
+Victoria <- cities[[4]]
+Windsor <- cities[[5]]
+Yarmouth <- cities[[6]]
 ```
+
+Second, we will draw multiple temporal-trend plots. One for each city. To do this, I will write a function that input **city result** and output the **scatter plot**. This function would be based heavily on the lab manual provided by professor Julien Martin
+
+```{r}
+plotting_temporal_trend <- function (city){ 
+  
+  #city: Yarmouth, Windsord,...as a data frame
+
+mygraph <- ggplot(
+  data = city[!is.na(city$ave), ], # source of data
+  aes(x = year, y = ave)
+)
+
+# plot data points, regression, loess trace
+mygraph <- mygraph +
+  stat_smooth(method = lm, se = FALSE, color = "green") + # add linear regression, but no SE shading
+  stat_smooth(color = "red", se = FALSE) + # add loess
+  geom_point()+
+  ggtitle( "Rate of change in temperature of", deparse(substitute(city)))         # add data points
+
+mygraph
+}
+
+```
+
+
+Next, I will draw all 6 temporal trend graphs for all 6 cities
+
+```{r}
+plotting_temporal_trend(Alert)
+plotting_temporal_trend(Mould_Bay)
+plotting_temporal_trend(Sachs_Habor)
+plotting_temporal_trend(Victoria)
+plotting_temporal_trend(Windsor)
+plotting_temporal_trend(Yarmouth)
+```
+
+
+After the temporal trends, we want to estimate the rate of change (or the slope) in temperature for each city. 
+
+I will summarize all linear regression result in one table, so it is easy to compare
 
 ```{r}
 fitted_models = climate %>% 
@@ -246,13 +296,26 @@ fitted_models = climate %>%
                 ungroup %>% 
                 mutate(yearCoef = map(fit_ave, tidy))%>%
                 unnest(yearCoef)
+
 fitted_models
+```
+
+From the table, we can see the *slope* of each city is the **estimation**. I will display the result in a simpler table down below
+
+
+```{r}
+rate_of_change <-fitted_models %>% filter(term == "year")%>%
+                select(loc, estimate) %>% 
+                transmute(city= loc, rate_of_change=estimate)
+
+rate_of_change
 ```
 
 
 
+6. Compute the mean warming rate in the North and in the South by averaging the rates calculated separately for each station (1 point). Calculate a 95% CI for each of these means based on the 3 replicates stations. (2 points)
 
-6. Compute the mean warming rate in the North and in the South by averaging the rates calculated separately for each station (1 point). Calculate a 95% CI for each of these means based on the 3 replicates stations. (2 points). 
+
 
 
 -----------------------
