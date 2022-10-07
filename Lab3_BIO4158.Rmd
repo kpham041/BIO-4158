@@ -20,6 +20,9 @@ library(performance)
 library(see)
 library(patchwork)
 library(lmtest)
+library(pwr)
+library(broom)
+library(plyr)
 ```
 
 Loading data into R 
@@ -159,13 +162,96 @@ shapiro.test(residuals(RegModel.1))
 
 ```
   From the output, we can see that the p-value is 0.1807 > 0.05. Thus, the values do not deviate too much from Normal Distribution 
-  
-  
+
+
+Question 4d 
+
+f) We will show the output of the model 
+
+```{r}
+summary(RegModel.1)
+```
+
+From the output, we can see that the **p-value is 0.582**. Thus, we fail to reject the null Hypothesis. This means that 
+the slope is 0 ($\hat{\beta}$)=0). We can also interpret this as the independent variable **year** have no statistically significant relationship with the dependent variable **average temperature**
+
+4g) Provide a "biological" conclusion concerning climate change in Yarmouth (i.e: qualified statemement about climate change at this site including an estimate of raw effect sie, its precision and whether a trend of this magnitude matters).
+
+
+
+Calculation of effective size:
+
+ $$ d = \frac{b}{sb\sqrt{n-k-1}} = \frac{0.002649}{0.004785\sqrt{58-1-1}}=0.00739 $$
+ So, **effect size is 0.00739**
+ 
+Precision would be based on the standard error. We can also calculate the 95% confidence interval to show the precision. 
+ 
+ 
+My biological conclusion is that: The change in temperature in Yarmouth is not a serious issue. 
+
+
+
+4h) Provide a statement about your confidence in the statistical conclusion (for example with respect to the violation of certain assumptions, to potential biases created by missing data, to suboptimal experimental design, and/or to power issues). 
+
+The data that we are analyzing comes from the city Yarmouth.
+
+```{r}
+head(Yarmouth,6)
+```
+
+
+- First, I want to address whether or not the data the violate assumptions for linear regression model. From several tests being done in part e, we can see that the data violate 2 assumptions (there no linear relationship between independenta variable, and there is an autocorrelation between the residuals). Thus, I am **not confident** that the data would give a good analysis. 
+
+- Secondly, I want to address bias due to missing data (NA values). For this data set Yarmouth, that is not an issue because we do not have NA values in the data set.
+
+- Thirdly, I want to discuss the experimental design of the data. Since the data is collected from the goverment website, there is not enough sufficient information for me to have a conclusion on how the data should be collected. 
+
+- Fourth, I want to calculate the power of the hypotheis test on the estimation of climate change rate in Yarth mouth
+
+We have: $n=58, d= 0.00739, \alpha=0.05$
+
+```{r}
+pwr.t.test(n = 58, 
+           d = 0.00739, 
+           sig.level = 0.05, 
+           type = "one.sample")
+```
+
+From the output, we can see that the **power= 0.050**, which is very low. From this, we know that there is a high chance we will have type II error in our analysis. 
+
+
+Overall, From addressing quality of data and power, I conclude that we **should not** make any conclusion from this analysis
 
 
   
   
 5. Yarmouth is only one of the six locations for which she needs to quantify the extent of any climate change. Plot the temporal trend for temperature separately for each station (2 points), and estimate the rate of change for each station (2 points).
+
+```{r}
+# All_loc_regression <-climate %>% 
+#                       group_by(loc) %>% 
+#                       nest() %>% 
+#                       mutate(model = map(data, ~lm(ave ~ year, data = .)))
+# 
+# for (cat in All_loc_regression$model){
+#   
+#   print(cat)
+# }
+```
+
+```{r}
+fitted_models = climate %>% 
+                group_by(loc) %>% 
+                do(fit_ave = lm(ave ~year, data = .)) %>% 
+                ungroup %>% 
+                mutate(yearCoef = map(fit_ave, tidy))%>%
+                unnest(yearCoef)
+fitted_models
+```
+
+
+
+
 6. Compute the mean warming rate in the North and in the South by averaging the rates calculated separately for each station (1 point). Calculate a 95% CI for each of these means based on the 3 replicates stations. (2 points). 
 
 
