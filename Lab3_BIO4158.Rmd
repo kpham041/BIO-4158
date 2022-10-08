@@ -1,12 +1,12 @@
 ---
 title: "Bio4158 - Devoir 3"
-author: "Groupe XX - Nom1, Nom2, Nom3"
+author: "Michael Pham (300129636), Yacine Marouf (300112014), Tristan Lachance (300059877)"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     number_sections: no
+  html_document:
+    df_print: paged
 ---
 
 Here are the needed packages
@@ -23,6 +23,7 @@ library(lmtest)
 library(pwr)
 library(broom)
 library(plyr)
+library(Rmisc)
 ```
 
 Loading data into R 
@@ -43,34 +44,36 @@ Answer the following questions. Total marks = 30.
 
 1. What is the ‘biological’ (scientific) hypothesis? (1 point)
 
-** Climate change is observed to be warming.
-There is a variation in changes in temperature across different geographic location, and this pheonomena is causes by the variation in human activities across region **
+**Climate change is observed to be warming. There is a variation in changes in temperature across different geographic location, and this pheonomena is causes by the variation in human activities across region**
 
 
 2. What does this hypothesis predict in the context of her study? (2 points)
 
-** This hypothesis predicts that warming is more prevalent in the Northern area compared to the Southern Area **
+**This hypothesis predicts that warming is more prevalent in the Northern area compared to the Southern Area **
 
 
 3. What is the associated null hypothesis? (2 points)
 
-** H_o: North Area and South Are have the same increase in temparature **
+**H_o: North Area and South Are have the same increase in temparature **
 
 
 4. To test this hypothesis, the student will need to quantify the extent of any climate change separately for each location. She’s interested not only in the point estimate of the rate of climate change for each location (which she needs for testing her biological hypothesis above), but also in its significance in each location (i.e. she wants to separately test whether there is evidence that climate has changed in any way at each site). Let’s start by conducting a regression analysis to test whether there is evidence of climate change in **Yarmouth**  
-    a. What is the statistical null hypothesis relevant to the analysis ofthe Yarmouth data? (2 points)
+
+
+a. What is the statistical null hypothesis relevant to the analysis ofthe Yarmouth data? (2 points)
     
     
-   **There is no linear relationship between year and average tempterature in Yarmouth**
+**The rate of change in temaperature is 0 **
    
-   b) What is the statistical model in the verbal form ? 
+b) What is the statistical model in the verbal form ? 
   
-  Annual_Average_temperature = Year+ Error
+  
+**Annual_Average_temperature = Year+ Error**
     
     
-  c) Provide a relevant plot of the Yarthmouth data
+c) Provide a relevant plot of the Yarthmouth data
   
-  **In this case, we would use the scatter plot**
+**In this case, we would use the scatter plot**
   
 ```{r}
     Yarmouth <- climate %>% filter(loc=="Y") %>% arrange(year)
@@ -94,7 +97,7 @@ mygraph
   d) Fit the model with and shows the R output 
     
 ```{r}
- RegModel.1 <- lm(ave ~ year, data = Yarmouth)
+RegModel.1 <- lm(ave ~ year, data = Yarmouth)
 summary(RegModel.1)
 ```
   e) State the statistical assumptions for the analysis of Yarmouth data and provide some evidence that you examined them
@@ -114,13 +117,13 @@ We will provide the graphs for visualization purpose only. We would not use them
 
 
 
-  **residuals plot**
+**residuals plot**
   
 ```{r}
 par(mfrow = c(2, 2), las = 1)
 plot(RegModel.1)
 ```
-  **Linearity plots**
+**Linearity plots**
 ```{r}
 check_model(RegModel.1)
 
@@ -151,7 +154,7 @@ Thirdly, we will use the the RESET test is a test of the assumption of linearity
 resettest(RegModel.1)
 
 ```
-From the output, we can see that the RESET point = 7.689, which is way bigger than 1 ,and the p-value is 0.001153 <0.05. Thus, we can reject the Null Hypothesis and conclude that there is no linear relationship. 
+From the output, we can see that the **RESET point = 7.689**, which is way bigger than 1 ,and the **p-value is 0.001153 <0.05**. Thus, we can reject the Null Hypothesis and conclude that there is no linear relationship. 
 
 
 Finally, we will use the Shapiro-Wilk normality test on the residual to confirm that the deviation from normality of the residuals is not large
@@ -161,12 +164,16 @@ Finally, we will use the Shapiro-Wilk normality test on the residual to confirm 
 shapiro.test(residuals(RegModel.1))
 
 ```
-  From the output, we can see that the p-value is 0.1807 > 0.05. Thus, the values do not deviate too much from Normal Distribution 
+  From the output, we can see that the **p-value is 0.1807 > 0.05**. Thus, the values **do not deviate too much from Normal Distribution**
+  
+  
+*Overall, we can see that the data violate 2 assumptions: linearity and correlation bewteen residuals. Otherwise, the data pass all other assumptions mentioned above*
 
 
-Question 4d 
 
-f) We will show the output of the model 
+4f) Whta is the statistical conclusion (inference - do you aceept the null ? )
+
+We will show the output of the model 
 
 ```{r}
 summary(RegModel.1)
@@ -181,7 +188,7 @@ the slope is 0 ($\hat{\beta}$)=0). We can also interpret this as the independent
 
 Calculation of effective size:
 
- $$ d = \frac{b}{sb\sqrt{n-k-1}} = \frac{0.002649}{0.004785\sqrt{58-1-1}}=0.00739 $$
+ $$ d = \frac{b}{sb\sqrt{n-k-1}} = \frac{0.002649}{0.004785\sqrt{58-1-1}}=0.0739 $$
  So, **effect size is 0.00739**
  
 Precision would be based on the standard error. We can also calculate the 95% confidence interval to show the precision. 
@@ -189,6 +196,15 @@ Precision would be based on the standard error. We can also calculate the 95% co
  
 My biological conclusion is that: The change in temperature in Yarmouth is not a serious issue. 
 
+For the precision, I can calculate the confidence interval of the slope
+
+```{r}
+confint(RegModel.1)
+```
+
+We can see that. Given the estimation of the slope, the confidence interval is significantly large. Thus, this analysis has a **low precision**.
+
+The **magnitude of the trend** is small statistically. However, according to IPCC, only $6^oC$ increased would cause a dire consequence. Thus, it may still be worthwhile to put the little increasing tred into consideration.
 
 
 4h) Provide a statement about your confidence in the statistical conclusion (for example with respect to the violation of certain assumptions, to potential biases created by missing data, to suboptimal experimental design, and/or to power issues). 
@@ -208,23 +224,22 @@ head(Yarmouth,6)
 
 - Fourth, I want to calculate the power of the hypotheis test on the estimation of climate change rate in Yarth mouth
 
-We have: $n=58, d= 0.00739, \alpha=0.05$
+We have: $n=58, d= 0.0739, \alpha=0.05$
 
 ```{r}
 pwr.t.test(n = 58, 
-           d = 0.00739, 
+           d = 0.0739, 
            sig.level = 0.05, 
            type = "one.sample")
 ```
 
-From the output, we can see that the **power= 0.050**, which is very low. From this, we know that there is a high chance we will have type II error in our analysis. 
+From the output, we can see that the **power= 0.0857**, which is very low. From this, we know that there is a high chance we will have type II error in our analysis. 
 
 
 Overall, From addressing quality of data and power, I conclude that we **should not** make any conclusion from this analysis
 
 
-  
-  
+
 5. Yarmouth is only one of the six locations for which she needs to quantify the extent of any climate change. Plot the temporal trend for temperature separately for each station (2 points), and estimate the rate of change for each station (2 points).
 
 
@@ -248,7 +263,7 @@ Windsor <- cities[[5]]
 Yarmouth <- cities[[6]]
 ```
 
-Second, we will draw multiple temporal-trend plots. One for each city. To do this, I will write a function that input **city result** and output the **scatter plot**. This function would be based heavily on the lab manual provided by professor Julien Martin
+Second, we will draw multiple temporal-trend plots. One for each city. To do this, I will write a function that input **city** and output the **scatter plot**. This function would be based heavily on the lab manual provided by professor Julien Martin
 
 ```{r}
 plotting_temporal_trend <- function (city){ 
@@ -304,34 +319,63 @@ From the table, we can see the *slope* of each city is the **estimation**. I wil
 
 
 ```{r}
-rate_of_change <-fitted_models %>% filter(term == "year")%>%
-                select(loc, estimate) %>% 
-                transmute(city= loc, rate_of_change=estimate)
+rate_of_change_table <-fitted_models %>% 
+                      filter(term == "year")%>%
+                      select(loc, estimate) %>% 
+                      transmute(city= loc,  rate_of_change=estimate)
 
-rate_of_change
+rate_of_change_table 
 ```
 
 
 
 6. Compute the mean warming rate in the North and in the South by averaging the rates calculated separately for each station (1 point). Calculate a 95% CI for each of these means based on the 3 replicates stations. (2 points)
 
-
-
-
------------------------
-
-Do not forget if you want to use Rmarkdown, first add multiple empty lines between each questions then add code chunks to type your R code in them. and write your interpretation below.
-    
-    
-    
-    
-    
-
-# X. example question
+From queston 5, we have this data: 
 
 ```{r}
-#write your code here
+rate_of_change_table <- rate_of_change_table %>% mutate(region= c("North","North","North","South","South","South")) %>%
+                  select(region, city, rate_of_change)
+
+rate_of_change_table
 
 ```
 
-Write your interpretation
+We then calculate the mean warming rate and standard deviation of warming rate for the North and the South
+
+```{r}
+rate_of_change_table %>% group_by(region) %>% 
+  summarise_at(vars(rate_of_change),list(region_mean = mean, region_sd= sd))
+
+```
+
+
+ To calculate the 95% Confidence interval for each mean, we would use the t-test, with the degree of freedom of n-1. We the sample size n=3, so n-1 = 2. We will use `t.test()` to solve the confidence interval
+ 
+So we have: $$n=3, \alpha=0,05$$ 
+
+The formula to calculate confidence interval is:
+
+$$\bar{u} \pm t_{\alpha/2,n-1} * se(\bar{u})$$
+
+
+
+Here is the confidence interval for the mean warming rate in the **North**
+
+```{r}
+north_result <- as.vector((rate_of_change_table %>% filter(region =="North"))$rate_of_change)
+
+t.test(north_result)
+```
+It is  **[-0.02799273  0.08454226]**
+
+Here is the confidence interval for the mean warming rate in the **South**
+
+```{r}
+south_result <- as.vector((rate_of_change_table %>% filter(region =="South"))$rate_of_change)
+
+t.test(south_result)
+```
+It is: **[-0.01183302 , 0.04226223]**
+
+    

@@ -1,0 +1,282 @@
+---
+title: "Assignment_2_BIO_4158"
+author: "Michael Pham (300129636), Yacine Marouf (300112014), Tristan Lachance (300059877)"
+date: "2022-09-28"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Here are the needed packages
+```{r}
+
+### Load the packages needed
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(pwr)
+library(tinytex)
+```
+
+
+We will load the dataset to R in here: 
+
+```{r} 
+setwd("/Users/apple/Desktop/BIO_4158 /BIO 4158 lab/Data sets BIO 4158")
+getwd()
+mydata <-read_csv("simulies.csv")
+
+```
+
+#1. Calculate the mean mass and its standard deviation at each site.
+
+
+```{r} 
+
+mydata_new <-mydata %>% mutate(Mass = 1.36 *(Length^3.05))
+
+mydata_new %>% 
+  group_by(Site) %>% 
+  summarise(mean= mean(Mass), standard_deviation=sd(Mass))
+```
+
+
+
+#2. Using the mean mass of P. mixtum/fuscum at Lovering as a reference and the standard deviations observed at each site, calculate the power of a two-tailed t test for independent means (4 points)
+
+We have: u1=13.1, u2=43.0, s1=23.8, s2=48.0
+
+```{r}
+# Function to calculate effective size 
+d <- function(u1, u2, sd1, sd2) {
+  abs(u1 - u2) / sqrt((sd1^2 + sd2^2) / 2)
+}
+
+# Power Analysis for 2 population ( not in the assignment )
+pwr.t.test(
+  n = 100,
+  d = d(u1 = 13.1 , sd1 = 23.8, u2 = 43.0, sd2 = 48.0),
+  sig.level = 0.05,
+  type = "two.sample")
+
+```
+
+
+
+
+2.a) if the mass difference was 5 µ g, α=0.05, and that 100 larvae were sampled at each site
+
+```{r}
+
+pwr.t.test(
+  n = 100,
+  d = d(u1 = 13.1 , sd1 = 23.8, u2 = 13.1+5 , sd2 = 48.0),
+  sig.level = 0.05,
+  type = "two.sample")
+
+```
+
+
+From the output, we can see that the power is **power= 0.153**
+
+
+
+
+
+2.b) if the mass difference was 20 µ g, α=0.05, and that 100 larvae were sampled at each site
+
+```{r}
+pwr.t.test(
+  n = 100,
+  d = d(u1 = 13.1 , sd1 = 23.8, u2 = 13.1+20 , sd2 = 48.0),
+  sig.level = 0.05,
+  type = "two.sample")
+```
+
+From 2b output, we can see that the power is: **power= 0.96**
+
+2.c) if the mass difference was 50 µ g, α=0.05, and that 100 larvae were sampled at each site
+
+
+
+
+```{r}
+pwr.t.test(
+  n = 100,
+  d = d(u1 = 13.1 , sd1 = 23.8, u2 = 13.1+50 , sd2 = 48.0),
+  sig.level = 0.05,
+  type = "two.sample")
+```
+From the output of 2c, we can see that the power is: **power= 1**
+
+
+2d) As we can see from other part of the question, power is directly proportional to the sample size. The larger the sample size, the larger the power. 
+
+
+
+#3. Calculate the required sample size to detect, with a two-tailed t-test for independent means, a difference of 50 µ g between the means (4 points)
+        Answer
+3.a) with a power of 80% and α=0.05
+
+```{r}
+## This piece of code will caculate detectable effect size
+pwr.t.test(
+  power = 0.8, # Power 
+  d = d(u1 = 13.1 , sd1 = 23.8, u2 = 13.1+50 , sd2 = 48.0), ## mean is 50ug
+  sig.level = 0.05, 
+  type = "two.sample")
+```
+
+
+From the 3a output, we can see that the sample size is **n=11 **
+
+
+
+
+ 3.b) with a power of 80% and α=0.001
+
+```{r}
+## This piece of code will caculate detectable effect size
+pwr.t.test(
+  power = 0.8, # Power 
+  d = d(u1 = 13.1 , sd1 = 23.8, u2 = 13.1+50 , sd2 = 48.0), ## mean is 50ug
+  sig.level = 0.001, 
+  type = "two.sample")
+```
+From the 3b output, we can see that the sample size is **n=23 **
+
+3.c) with a power of 95% and α=0.05
+
+```{r}
+## This piece of code will caculate detectable effect size
+pwr.t.test(
+  power = 0.95, # Power 
+  d = d(u1 = 13.1 , sd1 = 23.8, u2 = 13.1+50 , sd2 = 48.0),  ## mean is 50ug
+  sig.level = 0.05, 
+  type = "two.sample")
+```
+
+From the 3c output, we can see that the sample size is **n=16**
+
+3.d) comment on how changing power and α affects the required sample size.
+
+
+
+As from the result I collect from the output of R \
+
+- significant level vs sample size: Signficant level is **indirectly proportional** to sample size
+
+- power vs sample size: power is **directly proportional** to sample size
+
+
+#4. Calculate the detectable effect size (d) with a two-tailed t-test on independent means, given the observed standard deviations (4 points)
+
+4.a) with a power of 80%, α=0.05, and measurements on 10 larvae at each site
+
+```{r}
+pwr.t.test(
+  power = 0.8, # Power 
+  n = 10, ## Sample size 
+  sig.level = 0.05, 
+  type = "two.sample")
+
+```
+
+From output of 4a, we can see that the detectable effect size is **d=1.324947**
+
+
+
+4b) with a power of 80%, α=0.05, and measurements on 200 larvae at each site
+
+```{r}
+pwr.t.test(
+  power = 0.8, # Power 
+  n = 200, ## Sample size 
+  sig.level = 0.05, 
+  type = "two.sample")
+
+```
+
+From output of 4a, we can see that the detectable effect size is **d = 0.28**
+
+4.c) with a power of 80%, α=0.05, and measurements on 20 larvae at one site and 380 larvae at the second site
+
+```{r}
+pwr.t2n.test(
+  
+  n1=20,
+  n2=380,
+  power=0.8,
+  sig.level=0.05
+)
+
+```
+
+From the output of 4c, we can see that the detectable effect size is: **d = 0.6442829**
+
+
+ 4.d) comment on how changing sample sizes affect d.
+
+
+As we can see from the result, sample size is **indirectly proportional** to the effective size
+
+
+
+
+
+5. Calculate the difference in average mass, in µ g, that can be detected given your estimate of the minimum detectable effect size (d) at 4a, b, and c. (4 points)
+
+
+a) Difference in average mass in ug of 4a (power=0.8, alpha=0.05, n=10)
+
+
+```{r}
+pwr.t.test(
+  power = 0.8,
+  n = 10,
+  sig.level = 0.05,
+  type = "two.sample")$d * sqrt((23.8^2 + 48.0^2) / 2)
+```
+
+From the output, we can see that the difference is: **difference= 50.19467**
+
+
+b )Difference in avarage mass in ug of 4b (power=0.8, alpha=0.05, n=200)
+
+```{r}
+
+pwr.t.test(
+  power = 0.8,
+  n = 200,
+  sig.level = 0.05,
+  type = "two.sample")$d * sqrt((23.8^2 + 48.0^2) / 2)
+```
+
+From the output, we can see that the difference is: **difference= 10.63892**
+
+
+
+
+c) Difference in average mass in ug of 4c (power=0.8, alpha=0.05, n1=20,n2=80)
+
+```{r}
+
+pwr.t2n.test(
+  
+  n1=20,
+  n2=380,
+  power=0.8,
+  sig.level=0.05
+)$d * sqrt((23.8^2 + 48.0^2) / 2)
+
+```
+
+From the output, we have the difference is: **difference = 24.40821**
+
